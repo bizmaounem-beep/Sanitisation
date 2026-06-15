@@ -2002,7 +2002,28 @@ def trigger_manual_backup():
     db.commit()
     return jsonify({'message': 'Backup created successfully'})
 
+def get_local_ip():
+    import socket
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        # doesn't even have to be reachable
+        s.connect(('10.255.255.255', 1))
+        IP = s.getsockname()[0]
+    except Exception:
+        IP = '127.0.0.1'
+    finally:
+        s.close()
+    return IP
+
 # --- Application Startup ---
 if __name__ == '__main__':
     init_db()
+    local_ip = get_local_ip()
+    print("\n" + "=" * 60)
+    print("   SANITISATION APP - LOCAL WI-FI ACCESS INFO")
+    print("=" * 60)
+    print(f" * Server Local IP: {local_ip}")
+    print(f" * Access URL for devices on the same Wi-Fi:")
+    print(f"   -> http://{local_ip}:5000")
+    print("=" * 60 + "\n")
     app.run(host='0.0.0.0', port=5000, debug=True)

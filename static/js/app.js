@@ -10,7 +10,8 @@ const App = {
         tasks: [],
         activeTimerInterval: null,
         activeTimerTaskId: null,
-        currentPIN: ''
+        currentPIN: '',
+        globalListenersSetup: false
     },
 
     escapeHTML(str) {
@@ -209,30 +210,30 @@ const App = {
 
     // --- Global Event Listeners ---
     setupGlobalEventListeners() {
-        // Language Toggle dropdown
-        const langBtn = document.getElementById('lang-btn');
-        const langDropdown = document.getElementById('lang-dropdown');
-        if (langBtn && langDropdown) {
-            langBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                langDropdown.style.display = langDropdown.style.display === 'flex' ? 'none' : 'flex';
-            });
+        if (this.state.globalListenersSetup) return;
+        this.state.globalListenersSetup = true;
 
-            document.addEventListener('click', () => {
-                langDropdown.style.display = 'none';
-            });
-        }
-
-        // Modal closures
-        document.querySelectorAll('.modal-backdrop').forEach(modal => {
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) {
-                    modal.style.display = 'none';
-                    if (modal.id === 'task-completion-modal') {
-                        this.stopActiveWorkerTimerDisplay();
-                    }
+        // Language Toggle dropdown using robust document event delegation
+        document.addEventListener('click', (e) => {
+            const langBtn = document.getElementById('lang-btn');
+            const langDropdown = document.getElementById('lang-dropdown');
+            if (langBtn && langDropdown) {
+                if (langBtn.contains(e.target)) {
+                    langDropdown.style.display = langDropdown.style.display === 'flex' ? 'none' : 'flex';
+                } else if (!langDropdown.contains(e.target)) {
+                    langDropdown.style.display = 'none';
                 }
-            });
+            }
+        });
+
+        // Modal closures when clicking backdrop using dynamic delegation
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal-backdrop')) {
+                e.target.style.display = 'none';
+                if (e.target.id === 'task-completion-modal') {
+                    this.stopActiveWorkerTimerDisplay();
+                }
+            }
         });
     },
 
@@ -829,7 +830,7 @@ const App = {
                             <div class="glass-panel mb-24">
                                 <h3 data-i18n="user_approval_title" style="margin-bottom:16px;">Pending Supervisor Approvals</h3>
                                 <div class="table-container">
-                                    <table>
+                                    <table id="pending-approvals-table">
                                         <thead>
                                             <tr>
                                                 <th data-i18n="name_label">Name</th>
@@ -863,7 +864,7 @@ const App = {
                             <div class="glass-panel mb-24">
                                 <h3 data-i18n="pending_resets_title" style="margin-bottom:16px;">Pending Password/PIN Reset Requests</h3>
                                 <div class="table-container">
-                                    <table>
+                                    <table id="pending-resets-table">
                                         <thead>
                                             <tr>
                                                 <th data-i18n="name_label">Name</th>
@@ -906,7 +907,7 @@ const App = {
                     <div class="glass-panel mb-24">
                         <h3 data-i18n="tasks_waiting_start" style="margin-bottom:16px;">Tasks Waiting to Start</h3>
                         <div class="table-container">
-                            <table>
+                            <table id="waiting-tasks-table">
                                 <thead>
                                     <tr>
                                         <th data-i18n="select_protocol">Protocol</th>
@@ -945,7 +946,7 @@ const App = {
                     <div class="glass-panel mb-24">
                         <h3 data-i18n="tasks_operating" style="margin-bottom:16px;">Tasks in Progress</h3>
                         <div class="table-container">
-                            <table>
+                            <table id="operating-tasks-table">
                                 <thead>
                                     <tr>
                                         <th data-i18n="select_protocol">Protocol</th>

@@ -1303,3 +1303,58 @@ html[dir="rtl"] .protocol-steps-list {
     white-space: nowrap;
     padding: 14px 18px;
 }
+
+/* Responsive Table Enhancements for Mobile (width <= 768px) */
+@media (max-width: 768px) {
+    /* Prevent horizontal sliding for all tables */
+    .table-container {
+        overflow-x: hidden !important;
+    }
+    
+    .table-container th,
+    .table-container td {
+        white-space: normal !important;
+        word-break: break-word !important;
+        padding: 8px 6px !important;
+        font-size: 11.5px !important;
+    }
+
+    /* Stack buttons vertically in Action cells to save horizontal space on mobile */
+    #users-table td:last-child div,
+    #inventory-table td:last-child div {
+        flex-direction: column !important;
+        gap: 4px !important;
+        align-items: stretch !important;
+    }
+    
+    /* Hide less critical columns to fit the table within the narrow screen */
+    
+    /* Audit Trail: Hide Role (2nd) and Timestamp (5th) */
+    #audit-table th:nth-child(2),
+    #audit-table td:nth-child(2),
+    #audit-table th:nth-child(5),
+    #audit-table td:nth-child(5) {
+        display: none !important;
+    }
+    
+    /* Inventory Logs: Hide Performed By (3rd) and Date (5th) */
+    #inventory-logs-table th:nth-child(3),
+    #inventory-logs-table td:nth-child(3),
+    #inventory-logs-table th:nth-child(5),
+    #inventory-logs-table td:nth-child(5) {
+        display: none !important;
+    }
+
+    /* Dashboard - Tasks Waiting to Start: Hide Status (4th) */
+    #waiting-tasks-table th:nth-child(4),
+    #waiting-tasks-table td:nth-child(4) {
+        display: none !important;
+    }
+
+    /* Dashboard - Tasks in Progress: Hide Status (4th) */
+    #operating-tasks-table th:nth-child(4),
+    #operating-tasks-table td:nth-child(4) {
+        display: none !important;
+    }
+}
+
