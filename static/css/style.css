@@ -1533,5 +1533,36 @@ html[dir="rtl"] .protocol-steps-list {
     html[lang="en"] #operating-tasks-table td:nth-child(5)::before { content: "Duration:"; color: var(--text-secondary); }
     html[lang="fr"] #operating-tasks-table td:nth-child(5)::before { content: "Durée:"; color: var(--text-secondary); }
     html[lang="ar"] #operating-tasks-table td:nth-child(5)::before { content: "المدة:"; color: var(--text-secondary); }
+
+    /* Low Stock Alerts Table card formatting */
+    #low-stock-alerts-table td:nth-child(1) {
+        font-size: 16px !important;
+        font-weight: 700 !important;
+        color: var(--danger) !important;
+        margin-bottom: 4px !important;
+    }
+    #low-stock-alerts-table td:nth-child(2) {
+        font-size: 13px !important;
+        color: var(--text-secondary) !important;
+        margin-bottom: 8px !important;
+    }
+    #low-stock-alerts-table td:nth-child(3),
+    #low-stock-alerts-table td:nth-child(4),
+    #low-stock-alerts-table td:nth-child(5) {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+    }
+    html[lang="en"] #low-stock-alerts-table td:nth-child(3)::before { content: "Current Stock:"; color: var(--text-secondary); }
+    html[lang="fr"] #low-stock-alerts-table td:nth-child(3)::before { content: "Stock Actuel:"; color: var(--text-secondary); }
+    html[lang="ar"] #low-stock-alerts-table td:nth-child(3)::before { content: "المخزون الحالي:"; color: var(--text-secondary); }
+
+    html[lang="en"] #low-stock-alerts-table td:nth-child(4)::before { content: "Min Alert Threshold:"; color: var(--text-secondary); }
+    html[lang="fr"] #low-stock-alerts-table td:nth-child(4)::before { content: "Seuil d'Alerte:"; color: var(--text-secondary); }
+    html[lang="ar"] #low-stock-alerts-table td:nth-child(4)::before { content: "حد التنبيه الأدنى:"; color: var(--text-secondary); }
+
+    html[lang="en"] #low-stock-alerts-table td:nth-child(5)::before { content: "Unit:"; color: var(--text-secondary); }
+    html[lang="fr"] #low-stock-alerts-table td:nth-child(5)::before { content: "Unité:"; color: var(--text-secondary); }
+    html[lang="ar"] #low-stock-alerts-table td:nth-child(5)::before { content: "الوحدة:"; color: var(--text-secondary); }
 }
 

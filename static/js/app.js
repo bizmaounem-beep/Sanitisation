@@ -609,9 +609,9 @@ const App = {
                             <div id="profile-avatar-container"></div>
                             <div class="photo-uploader-box" style="width:100%; max-width:200px; min-height:60px; padding:8px;" onclick="document.getElementById('profile-file').click()">
                                 <span style="font-size:12px;" data-i18n="change_profile_img">Change Photo</span>
-                                <input type="file" id="profile-file" style="display:none;" accept="image/*" onchange="App.handleUserPhotoUpload(this, 'profile-avatar-container', 'profile-photo-data')">
-                                <input type="hidden" id="profile-photo-data">
                             </div>
+                            <input type="file" id="profile-file" style="display:none;" accept="image/*" onchange="App.handleUserPhotoUpload(this, 'profile-avatar-container', 'profile-photo-data')">
+                            <input type="hidden" id="profile-photo-data">
                         </div>
                         <div class="form-group">
                             <label data-i18n="name_label">Full Name</label>
@@ -697,10 +697,10 @@ const App = {
                             <div class="photo-uploader-box" onclick="document.getElementById('file-before-start').click()">
                                 <span style="font-size:32px;">📸</span>
                                 <span style="font-size:12px;" data-i18n="upload_before">Upload Photo</span>
-                                <input type="file" id="file-before-start" style="display:none;" accept="image/*" capture="environment" onchange="App.handlePhotoUpload(this, 'preview-before-start', 'data-before-start')">
                                 <img id="preview-before-start" class="photo-preview-img" style="display:none;">
-                                <input type="hidden" id="data-before-start">
                             </div>
+                            <input type="file" id="file-before-start" style="display:none;" accept="image/*" capture="environment" onchange="App.handlePhotoUpload(this, 'preview-before-start', 'data-before-start')">
+                            <input type="hidden" id="data-before-start">
                         </div>
                         <button type="submit" class="btn btn-primary" style="width:100%;" data-i18n="btn_start_confirm">Start Work & Log Photo</button>
                     </form>
@@ -1007,7 +1007,7 @@ const App = {
                                 <h3 style="color:var(--danger); margin:0;" data-i18n="alert_low_stock">Low Stock Alerts</h3>
                             </div>
                             <div class="table-container">
-                                <table>
+                                <table id="low-stock-alerts-table">
                                     <thead>
                                         <tr>
                                             <th data-i18n="name_label">Product Name</th>
@@ -1239,9 +1239,9 @@ const App = {
                                 <div id="edit-user-avatar-container"></div>
                                 <div class="photo-uploader-box" style="flex:1; min-height:80px; padding:12px;" onclick="document.getElementById('edit-user-file').click()">
                                     <span style="font-size:12px;" data-i18n="change_profile_img">Change Photo</span>
-                                    <input type="file" id="edit-user-file" style="display:none;" accept="image/*" onchange="App.handleUserPhotoUpload(this, 'edit-user-avatar-container', 'edit-user-photo-data')">
-                                    <input type="hidden" id="edit-user-photo-data">
                                 </div>
+                                <input type="file" id="edit-user-file" style="display:none;" accept="image/*" onchange="App.handleUserPhotoUpload(this, 'edit-user-avatar-container', 'edit-user-photo-data')">
+                                <input type="hidden" id="edit-user-photo-data">
                             </div>
                         </div>
                         <button type="submit" class="btn btn-primary" style="width:100%;" data-i18n="btn_save">Save Changes</button>
@@ -1362,58 +1362,106 @@ const App = {
         }
     },
 
-    handleTaskFacilityChange() {
-        const facilitySelect = document.getElementById('task-facility');
-        const nodeSelect = document.getElementById('task-node');
-        if (!facilitySelect || !nodeSelect) return;
-        
-        const facilityId = parseInt(facilitySelect.value);
-        const nodes = this.state.facilityNodes || [];
-        
-        const isDescendant = (nodeId, ancestorId) => {
-            let currentId = nodeId;
-            while (currentId !== null) {
-                if (currentId === ancestorId) return true;
-                const current = nodes.find(n => n.id === currentId);
-                if (!current) break;
-                currentId = current.parent_id;
-            }
-            return false;
-        };
-        
-        const leafNodes = nodes.filter(n => 
-            (n.type === 'machine' || n.type === 'line' || n.type === 'production_line') && 
-            isDescendant(n.id, facilityId)
-        );
-        
-        nodeSelect.innerHTML = leafNodes.map(n => `<option value="${n.id}">${n.name} (${i18n.t(n.type)})</option>`).join('');
+    getNodePath(nodeId, nodes) {
+        const path = [];
+        if (!nodeId) return path;
+        let current = nodes.find(n => n.id === parseInt(nodeId));
+        while (current) {
+            path.unshift(current.id);
+            if (current.parent_id === null) break;
+            current = nodes.find(n => n.id === current.parent_id);
+        }
+        return path;
     },
 
-    handleEditTaskFacilityChange() {
-        const facilitySelect = document.getElementById('edit-task-facility');
-        const nodeSelect = document.getElementById('edit-task-node');
-        if (!facilitySelect || !nodeSelect) return;
-        
-        const facilityId = parseInt(facilitySelect.value);
+    renderFacilityCascade(containerId, targetInputId, selectedNodeId = null) {
+        const container = typeof containerId === 'string' ? document.getElementById(containerId) : containerId;
+        const targetInput = document.getElementById(targetInputId);
+        if (!container || !targetInput) return;
+
         const nodes = this.state.facilityNodes || [];
+        const path = this.getNodePath(selectedNodeId, nodes);
+
+        container.innerHTML = '';
         
-        const isDescendant = (nodeId, ancestorId) => {
-            let currentId = nodeId;
-            while (currentId !== null) {
-                if (currentId === ancestorId) return true;
-                const current = nodes.find(n => n.id === currentId);
-                if (!current) break;
-                currentId = current.parent_id;
+        let currentParentId = null;
+        let depth = 0;
+        
+        const getLabelForNodes = (lvlNodes) => {
+            if (lvlNodes.length === 0) return i18n.t('select_machine');
+            const types = [...new Set(lvlNodes.map(n => n.type))];
+            if (types.length === 1) {
+                const t = types[0];
+                return i18n.t(t) || t;
             }
-            return false;
+            return i18n.t('select_machine') || 'Component';
         };
-        
-        const leafNodes = nodes.filter(n => 
-            (n.type === 'machine' || n.type === 'line' || n.type === 'production_line') && 
-            isDescendant(n.id, facilityId)
-        );
-        
-        nodeSelect.innerHTML = leafNodes.map(n => `<option value="${n.id}">${n.name} (${i18n.t(n.type)})</option>`).join('');
+
+        while (true) {
+            const levelChildren = nodes.filter(n => n.parent_id === currentParentId);
+            if (levelChildren.length === 0) break;
+
+            const group = document.createElement('div');
+            group.className = 'form-group mb-12';
+
+            const rawLabel = getLabelForNodes(levelChildren);
+            const labelText = rawLabel.charAt(0).toUpperCase() + rawLabel.slice(1);
+
+            const label = document.createElement('label');
+            label.textContent = labelText;
+            group.appendChild(label);
+
+            const select = document.createElement('select');
+            select.className = 'form-control';
+            select.dataset.depth = depth;
+
+            const defaultOpt = document.createElement('option');
+            defaultOpt.value = '';
+            defaultOpt.textContent = `-- Select ${labelText} --`;
+            select.appendChild(defaultOpt);
+
+            levelChildren.forEach(child => {
+                const opt = document.createElement('option');
+                opt.value = child.id;
+                opt.textContent = child.name;
+                select.appendChild(opt);
+            });
+
+            group.appendChild(select);
+            container.appendChild(group);
+
+            const pathVal = path[depth];
+            if (pathVal !== undefined && levelChildren.some(c => c.id === pathVal)) {
+                select.value = pathVal;
+                currentParentId = pathVal;
+                depth++;
+            } else {
+                break;
+            }
+        }
+
+        const selects = container.querySelectorAll('select');
+        selects.forEach((select, idx) => {
+            select.addEventListener('change', () => {
+                const newPath = [];
+                for (let i = 0; i <= idx; i++) {
+                    const val = selects[i].value;
+                    if (val) newPath.push(parseInt(val));
+                }
+                const finalSelectedId = newPath.length > 0 ? newPath[newPath.length - 1] : null;
+                this.renderFacilityCascade(containerId, targetInputId, finalSelectedId);
+            });
+        });
+
+        let lastSelectedId = '';
+        for (let i = selects.length - 1; i >= 0; i--) {
+            if (selects[i].value) {
+                lastSelectedId = selects[i].value;
+                break;
+            }
+        }
+        targetInput.value = lastSelectedId;
+        targetInput.dispatchEvent(new Event('change'));
     },
 
     async handleCreateUser(e) {
@@ -2308,14 +2356,10 @@ const App = {
                 <div id="add-task-panel" style="display:none; margin-bottom:24px; padding:20px; background:hsla(222,47%,8%,0.4); border-radius:12px; border:1px solid var(--border-color);">
                     <h4 data-i18n="btn_assign_task" style="margin-bottom:16px;">Create & Assign Sanitation Task</h4>
                     <form onsubmit="App.handleCreateTask(event)">
-                        <div class="form-group">
-                            <label data-i18n="select_facility">Select Facility/Area</label>
-                            <select id="task-facility" class="form-control" onchange="App.handleTaskFacilityChange()" required></select>
-                        </div>
-                        <div class="form-group">
-                            <label data-i18n="select_machine">Select Station/Machine/Line</label>
-                            <select id="task-node" class="form-control" required></select>
-                        </div>
+                        <!-- Dynamic Facility Cascade Container -->
+                        <div id="task-facility-cascade-container"></div>
+                        <input type="hidden" id="task-node" required>
+
                         <div class="form-group">
                             <label data-i18n="select_protocol">Protocol</label>
                             <select id="task-protocol" class="form-control" required></select>
@@ -2329,10 +2373,10 @@ const App = {
                             <div class="photo-uploader-box" onclick="document.getElementById('task-location-file').click()" style="min-height: 100px; padding: 16px;">
                                 <span style="font-size:24px;">📸</span>
                                 <span style="font-size:12px; color:var(--text-secondary);">Upload Location Photo</span>
-                                <input type="file" id="task-location-file" style="display:none;" accept="image/*" capture="environment" onchange="App.handlePhotoUpload(this, 'task-location-preview', 'task-location-data')">
                                 <img id="task-location-preview" class="photo-preview-img" style="display:none;">
-                                <input type="hidden" id="task-location-data">
                             </div>
+                            <input type="file" id="task-location-file" style="display:none;" accept="image/*" capture="environment" onchange="App.handlePhotoUpload(this, 'task-location-preview', 'task-location-data')">
+                            <input type="hidden" id="task-location-data">
                         </div>
                         <div style="display:flex; gap:12px; margin-top:20px;">
                             <button type="submit" class="btn btn-primary" style="flex:1;" data-i18n="btn_assign_task">Assign Task</button>
@@ -2412,10 +2456,10 @@ const App = {
                                 <div class="photo-uploader-box" onclick="document.getElementById('file-after').click()">
                                     <span style="font-size:32px;">📸</span>
                                     <span style="font-size:12px;" data-i18n="upload_after">Upload Photo</span>
-                                    <input type="file" id="file-after" style="display:none;" accept="image/*" capture="environment" onchange="App.handlePhotoUpload(this, 'preview-after', 'data-after')">
                                     <img id="preview-after" class="photo-preview-img" style="display:none;">
-                                    <input type="hidden" id="data-after">
                                 </div>
+                                <input type="file" id="file-after" style="display:none;" accept="image/*" capture="environment" onchange="App.handlePhotoUpload(this, 'preview-after', 'data-after')">
+                                <input type="hidden" id="data-after">
                             </div>
                         </div>
                         
@@ -2489,14 +2533,10 @@ const App = {
                     <form onsubmit="App.handleSubmitEditTask(event)">
                         <input type="hidden" id="edit-task-id">
                         
-                        <div class="form-group">
-                            <label data-i18n="select_facility">Select Facility/Area</label>
-                            <select id="edit-task-facility" class="form-control" onchange="App.handleEditTaskFacilityChange()" required></select>
-                        </div>
-                        <div class="form-group">
-                            <label data-i18n="select_machine">Select Station/Machine/Line</label>
-                            <select id="edit-task-node" class="form-control" required></select>
-                        </div>
+                        <!-- Dynamic Facility Cascade Container -->
+                        <div id="edit-task-facility-cascade-container"></div>
+                        <input type="hidden" id="edit-task-node" required>
+
                         <div class="form-group">
                             <label data-i18n="select_protocol">Protocol</label>
                             <select id="edit-task-protocol" class="form-control" required></select>
@@ -2524,10 +2564,10 @@ const App = {
                             <div class="photo-uploader-box" onclick="document.getElementById('edit-task-location-file').click()" style="min-height: 100px; padding: 16px;">
                                 <span style="font-size:24px;">📸</span>
                                 <span style="font-size:12px; color:var(--text-secondary);">Upload New Location Photo</span>
-                                <input type="file" id="edit-task-location-file" style="display:none;" accept="image/*" capture="environment" onchange="App.handlePhotoUpload(this, 'edit-location-preview', 'edit-task-location-data')">
                                 <img id="edit-location-preview" class="photo-preview-img" style="display:none;">
-                                <input type="hidden" id="edit-task-location-data">
                             </div>
+                            <input type="file" id="edit-task-location-file" style="display:none;" accept="image/*" capture="environment" onchange="App.handlePhotoUpload(this, 'edit-location-preview', 'edit-task-location-data')">
+                            <input type="hidden" id="edit-task-location-data">
                         </div>
                         
                         <div style="display:flex; gap:12px; margin-top:20px;">
@@ -2597,13 +2637,7 @@ const App = {
             if (role === 'coordinator' || role === 'supervisor') {
                 const nodes = await API.getFacilityHierarchy();
                 this.state.facilityNodes = nodes;
-                const facilities = nodes.filter(n => n.parent_id === null);
-
-                const facilitySelect = document.getElementById('task-facility');
-                if (facilitySelect) {
-                    facilitySelect.innerHTML = facilities.map(f => `<option value="${f.id}">${f.name}</option>`).join('');
-                }
-                this.handleTaskFacilityChange();
+                this.renderFacilityCascade('task-facility-cascade-container', 'task-node');
 
                 const protocols = await API.getProtocols();
                 const protoSelect = document.getElementById('task-protocol');
@@ -2888,45 +2922,7 @@ const App = {
         const nodes = await API.getFacilityHierarchy();
         this.state.facilityNodes = nodes;
         
-        const getTopLevelAncestorId = (nodeId) => {
-            let current = nodes.find(n => n.id === nodeId);
-            while (current && current.parent_id !== null) {
-                const parent = nodes.find(n => n.id === current.parent_id);
-                if (!parent) break;
-                current = parent;
-            }
-            return current ? current.id : null;
-        };
-
-        const topLevelId = getTopLevelAncestorId(task.node_id);
-
-        const facilities = nodes.filter(n => n.parent_id === null);
-        const facilitySelect = document.getElementById('edit-task-facility');
-        if (facilitySelect) {
-            facilitySelect.innerHTML = facilities.map(f => `<option value="${f.id}">${f.name}</option>`).join('');
-            facilitySelect.value = topLevelId;
-        }
-
-        const isDescendant = (nodeId, ancestorId) => {
-            let currentId = nodeId;
-            while (currentId !== null) {
-                if (currentId === ancestorId) return true;
-                const current = nodes.find(n => n.id === currentId);
-                if (!current) break;
-                currentId = current.parent_id;
-            }
-            return false;
-        };
-
-        const nodeSelect = document.getElementById('edit-task-node');
-        if (nodeSelect) {
-            const leafNodes = nodes.filter(n => 
-                (n.type === 'machine' || n.type === 'line' || n.type === 'production_line') && 
-                isDescendant(n.id, topLevelId)
-            );
-            nodeSelect.innerHTML = leafNodes.map(n => `<option value="${n.id}">${n.name} (${i18n.t(n.type)})</option>`).join('');
-            nodeSelect.value = task.node_id;
-        }
+        this.renderFacilityCascade('edit-task-facility-cascade-container', 'edit-task-node', task.node_id);
 
         // Populate protocol selector list
         const protocols = await API.getProtocols();
