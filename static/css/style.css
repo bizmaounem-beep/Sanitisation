@@ -1309,52 +1309,229 @@ html[dir="rtl"] .protocol-steps-list {
     /* Prevent horizontal sliding for all tables */
     .table-container {
         overflow-x: hidden !important;
+        border: none !important;
+        background: transparent !important;
     }
     
-    .table-container th,
+    /* Turn tables into block list cards on mobile */
+    .table-container table, 
+    .table-container tbody, 
+    .table-container tr, 
     .table-container td {
+        display: block !important;
+        width: 100% !important;
+    }
+    
+    .table-container thead {
+        display: none !important; /* Hide standard headers */
+    }
+    
+    .table-container tr {
+        background: var(--bg-card) !important;
+        border: 1px solid var(--border-color) !important;
+        border-radius: var(--border-radius) !important;
+        margin-bottom: 16px !important;
+        padding: 16px !important;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.2) !important;
+    }
+    
+    .table-container td {
+        padding: 8px 0 !important;
+        border: none !important;
+        font-size: 13px !important;
         white-space: normal !important;
         word-break: break-word !important;
-        padding: 8px 6px !important;
-        font-size: 11.5px !important;
     }
-
-    /* Stack buttons vertically in Action cells to save horizontal space on mobile */
-    #users-table td:last-child div,
+    
+    /* Specific overrides for Inventory Table list */
+    #inventory-table td:nth-child(1) {
+        font-size: 16px !important;
+        font-weight: 700 !important;
+        color: var(--text-primary) !important;
+        margin-bottom: 4px !important;
+    }
+    #inventory-table td:nth-child(2) {
+        font-size: 13px !important;
+        color: var(--text-secondary) !important;
+        margin-bottom: 8px !important;
+    }
+    #inventory-table td:nth-child(3) {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        margin-bottom: 12px !important;
+    }
+    html[lang="en"] #inventory-table td:nth-child(3)::before { content: "Stock Level:"; color: var(--text-secondary); font-weight: 500; }
+    html[lang="fr"] #inventory-table td:nth-child(3)::before { content: "Niveau de stock:"; color: var(--text-secondary); font-weight: 500; }
+    html[lang="ar"] #inventory-table td:nth-child(3)::before { content: "مستوى المخزون:"; color: var(--text-secondary); font-weight: 500; }
+    #inventory-table td:nth-child(4) {
+        margin-top: 12px !important;
+        border-top: 1px solid var(--border-color) !important;
+        padding-top: 12px !important;
+    }
     #inventory-table td:last-child div {
-        flex-direction: column !important;
-        gap: 4px !important;
-        align-items: stretch !important;
+        display: flex !important;
+        flex-direction: row !important;
+        gap: 8px !important;
+        justify-content: flex-end !important;
+        align-items: center !important;
     }
+
+    /* User Accounts Table list card formatting */
+    #users-table td:nth-child(1) {
+        margin-bottom: 8px !important;
+    }
+    #users-table td:nth-child(2),
+    #users-table td:nth-child(3) {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+    }
+    html[lang="en"] #users-table td:nth-child(2)::before { content: "Role:"; color: var(--text-secondary); }
+    html[lang="fr"] #users-table td:nth-child(2)::before { content: "Rôle:"; color: var(--text-secondary); }
+    html[lang="ar"] #users-table td:nth-child(2)::before { content: "الدور:"; color: var(--text-secondary); }
     
-    /* Hide less critical columns to fit the table within the narrow screen */
-    
-    /* Audit Trail: Hide Role (2nd) and Timestamp (5th) */
-    #audit-table th:nth-child(2),
+    html[lang="en"] #users-table td:nth-child(3)::before { content: "Status:"; color: var(--text-secondary); }
+    html[lang="fr"] #users-table td:nth-child(3)::before { content: "Statut:"; color: var(--text-secondary); }
+    html[lang="ar"] #users-table td:nth-child(3)::before { content: "الحالة:"; color: var(--text-secondary); }
+    #users-table td:nth-child(4) {
+        margin-top: 12px !important;
+        border-top: 1px solid var(--border-color) !important;
+        padding-top: 12px !important;
+    }
+    #users-table td:last-child div {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: wrap !important;
+        gap: 8px !important;
+        justify-content: flex-end !important;
+        align-items: center !important;
+    }
+
+    /* Audit Trail Table timeline list card formatting */
+    #audit-table td:nth-child(1) {
+        font-size: 14px !important;
+        margin-bottom: 4px !important;
+    }
     #audit-table td:nth-child(2),
-    #audit-table th:nth-child(5),
-    #audit-table td:nth-child(5) {
-        display: none !important;
+    #audit-table td:nth-child(3) {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
     }
+    html[lang="en"] #audit-table td:nth-child(2)::before { content: "Role:"; color: var(--text-secondary); }
+    html[lang="fr"] #audit-table td:nth-child(2)::before { content: "Rôle:"; color: var(--text-secondary); }
+    html[lang="ar"] #audit-table td:nth-child(2)::before { content: "الدور:"; color: var(--text-secondary); }
     
-    /* Inventory Logs: Hide Performed By (3rd) and Date (5th) */
-    #inventory-logs-table th:nth-child(3),
-    #inventory-logs-table td:nth-child(3),
-    #inventory-logs-table th:nth-child(5),
+    html[lang="en"] #audit-table td:nth-child(3)::before { content: "Action:"; color: var(--text-secondary); }
+    html[lang="fr"] #audit-table td:nth-child(3)::before { content: "Action:"; color: var(--text-secondary); }
+    html[lang="ar"] #audit-table td:nth-child(3)::before { content: "الإجراء:"; color: var(--text-secondary); }
+    #audit-table td:nth-child(4) {
+        margin: 8px 0 !important;
+        background: hsla(222, 47%, 8%, 0.4) !important;
+        padding: 8px 12px !important;
+        border-radius: 8px !important;
+        font-size: 13px !important;
+    }
+    #audit-table td:nth-child(5) {
+        font-size: 11px !important;
+        color: var(--text-muted) !important;
+        text-align: right !important;
+    }
+    html[dir="rtl"] #audit-table td:nth-child(5) {
+        text-align: left !important;
+    }
+
+    /* Inventory Logs Table card formatting */
+    #inventory-logs-table td:nth-child(1) {
+        font-size: 15px !important;
+        font-weight: 700 !important;
+        margin-bottom: 4px !important;
+    }
+    #inventory-logs-table td:nth-child(2),
+    #inventory-logs-table td:nth-child(3) {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+    }
+    html[lang="en"] #inventory-logs-table td:nth-child(2)::before { content: "Change:"; color: var(--text-secondary); }
+    html[lang="fr"] #inventory-logs-table td:nth-child(2)::before { content: "Modification:"; color: var(--text-secondary); }
+    html[lang="ar"] #inventory-logs-table td:nth-child(2)::before { content: "التغيير:"; color: var(--text-secondary); }
+    
+    html[lang="en"] #inventory-logs-table td:nth-child(3)::before { content: "By:"; color: var(--text-secondary); }
+    html[lang="fr"] #inventory-logs-table td:nth-child(3)::before { content: "Par:"; color: var(--text-secondary); }
+    html[lang="ar"] #inventory-logs-table td:nth-child(3)::before { content: "بواسطة:"; color: var(--text-secondary); }
+    #inventory-logs-table td:nth-child(4) {
+        margin: 8px 0 !important;
+        font-size: 13px !important;
+        color: var(--text-secondary) !important;
+    }
     #inventory-logs-table td:nth-child(5) {
-        display: none !important;
+        font-size: 11px !important;
+        color: var(--text-muted) !important;
+        text-align: right !important;
+    }
+    html[dir="rtl"] #inventory-logs-table td:nth-child(5) {
+        text-align: left !important;
     }
 
-    /* Dashboard - Tasks Waiting to Start: Hide Status (4th) */
-    #waiting-tasks-table th:nth-child(4),
-    #waiting-tasks-table td:nth-child(4) {
-        display: none !important;
+    /* Pending Approvals & Reset Requests */
+    #pending-approvals-table td:last-child, 
+    #pending-resets-table td:last-child {
+        margin-top: 8px !important;
+        border-top: 1px solid var(--border-color) !important;
+        padding-top: 8px !important;
+    }
+    #pending-approvals-table td:last-child div,
+    #pending-resets-table td:last-child div {
+        display: flex !important;
+        flex-direction: row !important;
+        gap: 8px !important;
+        justify-content: flex-end !important;
     }
 
-    /* Dashboard - Tasks in Progress: Hide Status (4th) */
-    #operating-tasks-table th:nth-child(4),
-    #operating-tasks-table td:nth-child(4) {
-        display: none !important;
+    /* Dashboard tasks list card formatting */
+    #waiting-tasks-table td:nth-child(1),
+    #operating-tasks-table td:nth-child(1) {
+        font-size: 15px !important;
+        font-weight: 700 !important;
+        color: var(--info) !important;
+        margin-bottom: 4px !important;
     }
+    #waiting-tasks-table td:nth-child(2),
+    #waiting-tasks-table td:nth-child(3),
+    #waiting-tasks-table td:nth-child(4),
+    #operating-tasks-table td:nth-child(2),
+    #operating-tasks-table td:nth-child(3),
+    #operating-tasks-table td:nth-child(4),
+    #operating-tasks-table td:nth-child(5) {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+    }
+    html[lang="en"] #waiting-tasks-table td:nth-child(2)::before,
+    html[lang="en"] #operating-tasks-table td:nth-child(2)::before { content: "Area:"; color: var(--text-secondary); }
+    html[lang="fr"] #waiting-tasks-table td:nth-child(2)::before,
+    html[lang="fr"] #operating-tasks-table td:nth-child(2)::before { content: "Zone:"; color: var(--text-secondary); }
+    html[lang="ar"] #waiting-tasks-table td:nth-child(2)::before,
+    html[lang="ar"] #operating-tasks-table td:nth-child(2)::before { content: "المنطقة:"; color: var(--text-secondary); }
+    
+    html[lang="en"] #waiting-tasks-table td:nth-child(3)::before,
+    html[lang="en"] #operating-tasks-table td:nth-child(3)::before { content: "Worker:"; color: var(--text-secondary); }
+    html[lang="fr"] #waiting-tasks-table td:nth-child(3)::before,
+    html[lang="fr"] #operating-tasks-table td:nth-child(3)::before { content: "Employé:"; color: var(--text-secondary); }
+    html[lang="ar"] #waiting-tasks-table td:nth-child(3)::before,
+    html[lang="ar"] #operating-tasks-table td:nth-child(3)::before { content: "العامل:"; color: var(--text-secondary); }
+
+    html[lang="en"] #waiting-tasks-table td:nth-child(4)::before,
+    html[lang="en"] #operating-tasks-table td:nth-child(4)::before { content: "Status:"; color: var(--text-secondary); }
+    html[lang="fr"] #waiting-tasks-table td:nth-child(4)::before,
+    html[lang="fr"] #operating-tasks-table td:nth-child(4)::before { content: "Statut:"; color: var(--text-secondary); }
+    html[lang="ar"] #waiting-tasks-table td:nth-child(4)::before,
+    html[lang="ar"] #operating-tasks-table td:nth-child(4)::before { content: "الحالة:"; color: var(--text-secondary); }
+
+    html[lang="en"] #operating-tasks-table td:nth-child(5)::before { content: "Duration:"; color: var(--text-secondary); }
+    html[lang="fr"] #operating-tasks-table td:nth-child(5)::before { content: "Durée:"; color: var(--text-secondary); }
+    html[lang="ar"] #operating-tasks-table td:nth-child(5)::before { content: "المدة:"; color: var(--text-secondary); }
 }
 
