@@ -133,6 +133,11 @@ const i18n = {
             stock_movement_logs: "Stock Movement Logs",
             log_quantity: "Amount Changed",
             log_user: "Logged By",
+            filter_all_categories: "All Categories",
+            filter_all_stocks: "All Stock Levels",
+            filter_low_stock_only: "Low Stock Only",
+            filter_optimal_stock_only: "Optimal Stock",
+            no_matching_items: "No matching items found",
             
             // Tasks Workflow
             tasks_title: "Sanitation Operations",
@@ -348,6 +353,11 @@ const i18n = {
             stock_movement_logs: "Historique des Mouvements",
             log_quantity: "Quantité Modifiée",
             log_user: "Modifié Par",
+            filter_all_categories: "Toutes les Catégories",
+            filter_all_stocks: "Tous les Niveaux de Stock",
+            filter_low_stock_only: "Stock Bas Uniquement",
+            filter_optimal_stock_only: "Stock Optimal",
+            no_matching_items: "Aucun article correspondant trouvé",
             
             tasks_title: "Opérations d'Assainissement",
             task_status_assigned: "Assignée",
@@ -559,6 +569,11 @@ const i18n = {
             stock_movement_logs: "سجل حركة المخزون",
             log_quantity: "الكمية المعدلة",
             log_user: "تم التعديل بواسطة",
+            filter_all_categories: "جميع الفئات",
+            filter_all_stocks: "جميع مستويات المخزون",
+            filter_low_stock_only: "المخزون المنخفض فقط",
+            filter_optimal_stock_only: "المخزون الكافي/المثالي",
+            no_matching_items: "لم يتم العثور على مواد مطابقة",
             
             tasks_title: "عمليات ومهام التعقيم",
             task_status_assigned: "تم التعيين",

@@ -2153,6 +2153,33 @@ const App = {
                 
                 ${formHTML}
                 
+                <!-- Search & Filters Toolbar -->
+                <div class="filters-bar" style="display:flex; gap:16px; flex-wrap:wrap; background:hsla(222,47%,8%,0.2); padding:16px; border-radius:12px; border:1px solid var(--border-color); margin-bottom:20px;">
+                    <div style="display:flex; gap:12px; flex:1; min-width:280px; flex-wrap:wrap;">
+                        <!-- Search input -->
+                        <div style="flex:1; min-width:180px;">
+                            <input type="text" id="inventory-search" class="form-control" placeholder="Search by product name..." oninput="App.filterInventoryList()" style="height:38px;">
+                        </div>
+                        <!-- Category Filter -->
+                        <div style="width:160px; min-width:140px;">
+                            <select id="inventory-filter-category" class="form-control" onchange="App.filterInventoryList()" style="height:38px;">
+                                <option value="" data-i18n="filter_all_categories">All Categories</option>
+                                <option value="chemical" data-i18n="chemical">Chemical Product</option>
+                                <option value="consumable" data-i18n="consumable">Consumable</option>
+                                <option value="equipment" data-i18n="equipment">Cleaning Tool / Equipment</option>
+                            </select>
+                        </div>
+                        <!-- Stock Level Filter -->
+                        <div style="width:160px; min-width:140px;">
+                            <select id="inventory-filter-stock" class="form-control" onchange="App.filterInventoryList()" style="height:38px;">
+                                <option value="" data-i18n="filter_all_stocks">All Stock Levels</option>
+                                <option value="low" data-i18n="filter_low_stock_only">Low Stock Only</option>
+                                <option value="optimal" data-i18n="filter_optimal_stock_only">Optimal Stock</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="table-container">
                     <table id="inventory-table">
                         <thead>
@@ -2221,35 +2248,64 @@ const App = {
         i18n.translateDOM();
     },
 
+    filterInventoryList() {
+        const query = (document.getElementById('inventory-search')?.value || '').toLowerCase().trim();
+        const category = document.getElementById('inventory-filter-category')?.value || '';
+        const stockFilter = document.getElementById('inventory-filter-stock')?.value || '';
+
+        const tableBody = document.querySelector('#inventory-table tbody');
+        if (!tableBody) return;
+
+        const role = this.state.currentUser.role;
+        const items = this.state.inventoryItems || [];
+
+        const filteredItems = items.filter(i => {
+            const matchesQuery = i.name.toLowerCase().includes(query);
+            const matchesCategory = category === '' || i.category === category;
+            const isLow = i.stock < i.min_stock;
+            const matchesStock = stockFilter === '' || 
+                                 (stockFilter === 'low' && isLow) || 
+                                 (stockFilter === 'optimal' && !isLow);
+
+            return matchesQuery && matchesCategory && matchesStock;
+        });
+
+        if (filteredItems.length === 0) {
+            tableBody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--text-secondary);" data-i18n="no_matching_items">No matching items found</td></tr>`;
+            if (window.i18n) window.i18n.translateDOM();
+            return;
+        }
+
+        tableBody.innerHTML = filteredItems.map(i => {
+            const isLow = i.stock < i.min_stock;
+            return `
+                <tr style="${isLow ? 'background: hsla(355, 85%, 58%, 0.15);' : ''}">
+                    <td>
+                        <div style="font-weight:600;">${this.escapeHTML(i.name)}</div>
+                        ${isLow ? `<span class="text-danger" style="font-size:11px; font-weight:700;"><span data-i18n="alert_low_stock">Low Stock</span>: < ${i.min_stock} ${this.escapeHTML(i.unit)}</span>` : ''}
+                    </td>
+                    <td><span style="font-size:13px; color:var(--text-secondary);">${i18n.t(i.category)}</span></td>
+                    <td><span style="font-weight:bold; font-size:16px; color:var(--text-primary);">${i.stock} ${this.escapeHTML(i.unit)}</span></td>
+                    <td>
+                        ${(role === 'coordinator' || role === 'supervisor') ? `
+                            <div style="display:flex; gap:8px;">
+                                <button class="btn btn-secondary" style="padding:6px 12px; font-size:12px;" onclick="App.openAdjustStockModal(${i.id})">Adjust</button>
+                                <button class="btn btn-danger" style="padding:6px 12px; font-size:12px;" onclick="App.deleteInventoryItem(${i.id})">Delete</button>
+                            </div>
+                        ` : ''}
+                    </td>
+                </tr>
+            `;
+        }).join('');
+
+        if (window.i18n) window.i18n.translateDOM();
+    },
+
     async loadInventoryDataAndRender() {
         try {
-            const tableBody = document.querySelector('#inventory-table tbody');
             const items = await API.getInventory();
             this.state.inventoryItems = items;
-
-            const role = this.state.currentUser.role;
-
-            tableBody.innerHTML = items.map(i => {
-                const isLow = i.stock < i.min_stock;
-                return `
-                    <tr style="${isLow ? 'background: hsla(355, 85%, 58%, 0.15);' : ''}">
-                        <td>
-                            <div style="font-weight:600;">${this.escapeHTML(i.name)}</div>
-                            ${isLow ? `<span class="text-danger" style="font-size:11px; font-weight:700;"><span data-i18n="alert_low_stock">Low Stock</span>: < ${i.min_stock} ${this.escapeHTML(i.unit)}</span>` : ''}
-                        </td>
-                        <td><span style="font-size:13px; color:var(--text-secondary);">${i18n.t(i.category)}</span></td>
-                        <td><span style="font-weight:bold; font-size:16px; color:var(--text-primary);">${i.stock} ${this.escapeHTML(i.unit)}</span></td>
-                        <td>
-                            ${(role === 'coordinator' || role === 'supervisor') ? `
-                                <div style="display:flex; gap:8px;">
-                                    <button class="btn btn-secondary" style="padding:6px 12px; font-size:12px;" onclick="App.openAdjustStockModal(${i.id})">Adjust</button>
-                                    <button class="btn btn-danger" style="padding:6px 12px; font-size:12px;" onclick="App.deleteInventoryItem(${i.id})">Delete</button>
-                                </div>
-                            ` : ''}
-                        </td>
-                    </tr>
-                `;
-            }).join('');
+            this.filterInventoryList();
 
             // Load logs
             const logsBody = document.querySelector('#inventory-logs-table tbody');
