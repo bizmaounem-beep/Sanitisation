@@ -697,7 +697,7 @@ const App = {
                             <div class="photo-uploader-box" onclick="document.getElementById('file-before-start').click()">
                                 <span style="font-size:32px;">📸</span>
                                 <span style="font-size:12px;" data-i18n="upload_before">Upload Photo</span>
-                                <input type="file" id="file-before-start" style="display:none;" accept="image/*" onchange="App.handlePhotoUpload(this, 'preview-before-start', 'data-before-start')">
+                                <input type="file" id="file-before-start" style="display:none;" accept="image/*" capture="environment" onchange="App.handlePhotoUpload(this, 'preview-before-start', 'data-before-start')">
                                 <img id="preview-before-start" class="photo-preview-img" style="display:none;">
                                 <input type="hidden" id="data-before-start">
                             </div>
@@ -1360,6 +1360,60 @@ const App = {
                 if (firstInput) firstInput.focus();
             }, 50);
         }
+    },
+
+    handleTaskFacilityChange() {
+        const facilitySelect = document.getElementById('task-facility');
+        const nodeSelect = document.getElementById('task-node');
+        if (!facilitySelect || !nodeSelect) return;
+        
+        const facilityId = parseInt(facilitySelect.value);
+        const nodes = this.state.facilityNodes || [];
+        
+        const isDescendant = (nodeId, ancestorId) => {
+            let currentId = nodeId;
+            while (currentId !== null) {
+                if (currentId === ancestorId) return true;
+                const current = nodes.find(n => n.id === currentId);
+                if (!current) break;
+                currentId = current.parent_id;
+            }
+            return false;
+        };
+        
+        const leafNodes = nodes.filter(n => 
+            (n.type === 'machine' || n.type === 'line' || n.type === 'production_line') && 
+            isDescendant(n.id, facilityId)
+        );
+        
+        nodeSelect.innerHTML = leafNodes.map(n => `<option value="${n.id}">${n.name} (${i18n.t(n.type)})</option>`).join('');
+    },
+
+    handleEditTaskFacilityChange() {
+        const facilitySelect = document.getElementById('edit-task-facility');
+        const nodeSelect = document.getElementById('edit-task-node');
+        if (!facilitySelect || !nodeSelect) return;
+        
+        const facilityId = parseInt(facilitySelect.value);
+        const nodes = this.state.facilityNodes || [];
+        
+        const isDescendant = (nodeId, ancestorId) => {
+            let currentId = nodeId;
+            while (currentId !== null) {
+                if (currentId === ancestorId) return true;
+                const current = nodes.find(n => n.id === currentId);
+                if (!current) break;
+                currentId = current.parent_id;
+            }
+            return false;
+        };
+        
+        const leafNodes = nodes.filter(n => 
+            (n.type === 'machine' || n.type === 'line' || n.type === 'production_line') && 
+            isDescendant(n.id, facilityId)
+        );
+        
+        nodeSelect.innerHTML = leafNodes.map(n => `<option value="${n.id}">${n.name} (${i18n.t(n.type)})</option>`).join('');
     },
 
     async handleCreateUser(e) {
@@ -2255,6 +2309,10 @@ const App = {
                     <h4 data-i18n="btn_assign_task" style="margin-bottom:16px;">Create & Assign Sanitation Task</h4>
                     <form onsubmit="App.handleCreateTask(event)">
                         <div class="form-group">
+                            <label data-i18n="select_facility">Select Facility/Area</label>
+                            <select id="task-facility" class="form-control" onchange="App.handleTaskFacilityChange()" required></select>
+                        </div>
+                        <div class="form-group">
                             <label data-i18n="select_machine">Select Station/Machine/Line</label>
                             <select id="task-node" class="form-control" required></select>
                         </div>
@@ -2271,7 +2329,7 @@ const App = {
                             <div class="photo-uploader-box" onclick="document.getElementById('task-location-file').click()" style="min-height: 100px; padding: 16px;">
                                 <span style="font-size:24px;">📸</span>
                                 <span style="font-size:12px; color:var(--text-secondary);">Upload Location Photo</span>
-                                <input type="file" id="task-location-file" style="display:none;" accept="image/*" onchange="App.handlePhotoUpload(this, 'task-location-preview', 'task-location-data')">
+                                <input type="file" id="task-location-file" style="display:none;" accept="image/*" capture="environment" onchange="App.handlePhotoUpload(this, 'task-location-preview', 'task-location-data')">
                                 <img id="task-location-preview" class="photo-preview-img" style="display:none;">
                                 <input type="hidden" id="task-location-data">
                             </div>
@@ -2354,7 +2412,7 @@ const App = {
                                 <div class="photo-uploader-box" onclick="document.getElementById('file-after').click()">
                                     <span style="font-size:32px;">📸</span>
                                     <span style="font-size:12px;" data-i18n="upload_after">Upload Photo</span>
-                                    <input type="file" id="file-after" style="display:none;" accept="image/*" onchange="App.handlePhotoUpload(this, 'preview-after', 'data-after')">
+                                    <input type="file" id="file-after" style="display:none;" accept="image/*" capture="environment" onchange="App.handlePhotoUpload(this, 'preview-after', 'data-after')">
                                     <img id="preview-after" class="photo-preview-img" style="display:none;">
                                     <input type="hidden" id="data-after">
                                 </div>
@@ -2432,6 +2490,10 @@ const App = {
                         <input type="hidden" id="edit-task-id">
                         
                         <div class="form-group">
+                            <label data-i18n="select_facility">Select Facility/Area</label>
+                            <select id="edit-task-facility" class="form-control" onchange="App.handleEditTaskFacilityChange()" required></select>
+                        </div>
+                        <div class="form-group">
                             <label data-i18n="select_machine">Select Station/Machine/Line</label>
                             <select id="edit-task-node" class="form-control" required></select>
                         </div>
@@ -2462,7 +2524,7 @@ const App = {
                             <div class="photo-uploader-box" onclick="document.getElementById('edit-task-location-file').click()" style="min-height: 100px; padding: 16px;">
                                 <span style="font-size:24px;">📸</span>
                                 <span style="font-size:12px; color:var(--text-secondary);">Upload New Location Photo</span>
-                                <input type="file" id="edit-task-location-file" style="display:none;" accept="image/*" onchange="App.handlePhotoUpload(this, 'edit-location-preview', 'edit-task-location-data')">
+                                <input type="file" id="edit-task-location-file" style="display:none;" accept="image/*" capture="environment" onchange="App.handlePhotoUpload(this, 'edit-location-preview', 'edit-task-location-data')">
                                 <img id="edit-location-preview" class="photo-preview-img" style="display:none;">
                                 <input type="hidden" id="edit-task-location-data">
                             </div>
@@ -2534,11 +2596,14 @@ const App = {
             // Populate selector lists for supervisor creation
             if (role === 'coordinator' || role === 'supervisor') {
                 const nodes = await API.getFacilityHierarchy();
-                // Filters node to Machines and Production Lines
-                const leafNodes = nodes.filter(n => n.type === 'machine' || n.type === 'line' || n.type === 'production_line');
+                this.state.facilityNodes = nodes;
+                const facilities = nodes.filter(n => n.parent_id === null);
 
-                const nodeSelect = document.getElementById('task-node');
-                nodeSelect.innerHTML = leafNodes.map(n => `<option value="${n.id}">${n.name} (${i18n.t(n.type)})</option>`).join('');
+                const facilitySelect = document.getElementById('task-facility');
+                if (facilitySelect) {
+                    facilitySelect.innerHTML = facilities.map(f => `<option value="${f.id}">${f.name}</option>`).join('');
+                }
+                this.handleTaskFacilityChange();
 
                 const protocols = await API.getProtocols();
                 const protoSelect = document.getElementById('task-protocol');
@@ -2819,12 +2884,49 @@ const App = {
 
         document.getElementById('edit-task-id').value = task.id;
 
-        // Populate node selector list
+        // Populate facility & node selector list
         const nodes = await API.getFacilityHierarchy();
-        const leafNodes = nodes.filter(n => n.type === 'machine' || n.type === 'line' || n.type === 'production_line');
+        this.state.facilityNodes = nodes;
+        
+        const getTopLevelAncestorId = (nodeId) => {
+            let current = nodes.find(n => n.id === nodeId);
+            while (current && current.parent_id !== null) {
+                const parent = nodes.find(n => n.id === current.parent_id);
+                if (!parent) break;
+                current = parent;
+            }
+            return current ? current.id : null;
+        };
+
+        const topLevelId = getTopLevelAncestorId(task.node_id);
+
+        const facilities = nodes.filter(n => n.parent_id === null);
+        const facilitySelect = document.getElementById('edit-task-facility');
+        if (facilitySelect) {
+            facilitySelect.innerHTML = facilities.map(f => `<option value="${f.id}">${f.name}</option>`).join('');
+            facilitySelect.value = topLevelId;
+        }
+
+        const isDescendant = (nodeId, ancestorId) => {
+            let currentId = nodeId;
+            while (currentId !== null) {
+                if (currentId === ancestorId) return true;
+                const current = nodes.find(n => n.id === currentId);
+                if (!current) break;
+                currentId = current.parent_id;
+            }
+            return false;
+        };
+
         const nodeSelect = document.getElementById('edit-task-node');
-        nodeSelect.innerHTML = leafNodes.map(n => `<option value="${n.id}">${n.name} (${i18n.t(n.type)})</option>`).join('');
-        nodeSelect.value = task.node_id;
+        if (nodeSelect) {
+            const leafNodes = nodes.filter(n => 
+                (n.type === 'machine' || n.type === 'line' || n.type === 'production_line') && 
+                isDescendant(n.id, topLevelId)
+            );
+            nodeSelect.innerHTML = leafNodes.map(n => `<option value="${n.id}">${n.name} (${i18n.t(n.type)})</option>`).join('');
+            nodeSelect.value = task.node_id;
+        }
 
         // Populate protocol selector list
         const protocols = await API.getProtocols();
