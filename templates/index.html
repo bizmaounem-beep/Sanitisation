@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sanitation Management System - Industrial Traceability Portal</title>
+    
+    <!-- Link to premium styles -->
+    <link rel="stylesheet" href="/static/css/style.css">
+    
+    <!-- Direct favicon to prevent default browser console errors -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧼</text></svg>">
+</head>
+<body>
+    <!-- App Mountpoint -->
+    <div id="app-root">
+        <!-- Will be dynamically populated by app.js -->
+        <div style="display: flex; min-height: 100vh; align-items: center; justify-content: center; background: hsl(222, 47%, 9%);">
+            <div style="text-align: center; color: white; font-family: sans-serif;">
+                <div style="display: inline-block; width: 40px; height: 40px; border: 4px solid rgba(255,255,255,0.1); border-top-color: hsl(263, 90%, 62%); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 16px;"></div>
+                <h2>Loading Sanitation Management System...</h2>
+                <p style="color: hsl(215, 25%, 72%); margin-top: 8px;">Preparing local factory network environment</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Spinner Animation CSS inlined for early render -->
+    <style>
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+
+    <!-- Import core client JS modules -->
+    <script src="/static/js/api.js"></script>
+    <script src="/static/js/i18n.js"></script>
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

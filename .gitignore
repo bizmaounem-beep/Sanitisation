@@ -1,0 +1,25 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv
+.env
+
+# SQLite database and backups
+database.db
+backups/
+
+# Application logs
+logs/
+
+# IDE settings
+.vscode/
+.idea/
+
+# Static Uploads
+static/uploads/*
+!static/uploads/.gitkeep
