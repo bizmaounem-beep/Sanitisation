@@ -2157,11 +2157,11 @@ const App = {
                 <div class="filters-bar" style="display:flex; gap:16px; flex-wrap:wrap; background:hsla(222,47%,8%,0.2); padding:16px; border-radius:12px; border:1px solid var(--border-color); margin-bottom:20px;">
                     <div style="display:flex; gap:12px; flex:1; min-width:280px; flex-wrap:wrap;">
                         <!-- Search input -->
-                        <div style="flex:1; min-width:180px;">
+                        <div style="flex:2; min-width:200px;">
                             <input type="text" id="inventory-search" class="form-control" placeholder="Search by product name..." oninput="App.filterInventoryList()" style="height:38px;">
                         </div>
                         <!-- Category Filter -->
-                        <div style="width:160px; min-width:140px;">
+                        <div style="flex:1; min-width:200px;">
                             <select id="inventory-filter-category" class="form-control" onchange="App.filterInventoryList()" style="height:38px;">
                                 <option value="" data-i18n="filter_all_categories">All Categories</option>
                                 <option value="chemical" data-i18n="chemical">Chemical Product</option>
@@ -2170,7 +2170,7 @@ const App = {
                             </select>
                         </div>
                         <!-- Stock Level Filter -->
-                        <div style="width:160px; min-width:140px;">
+                        <div style="flex:1; min-width:200px;">
                             <select id="inventory-filter-stock" class="form-control" onchange="App.filterInventoryList()" style="height:38px;">
                                 <option value="" data-i18n="filter_all_stocks">All Stock Levels</option>
                                 <option value="low" data-i18n="filter_low_stock_only">Low Stock Only</option>
