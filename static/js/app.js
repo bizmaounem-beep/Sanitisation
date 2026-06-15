@@ -2158,11 +2158,11 @@ const App = {
                     <div style="display:flex; gap:12px; flex:1; min-width:280px; flex-wrap:wrap;">
                         <!-- Search input -->
                         <div style="flex:2; min-width:200px;">
-                            <input type="text" id="inventory-search" class="form-control" placeholder="Search by product name..." oninput="App.filterInventoryList()" style="height:38px;">
+                            <input type="text" id="inventory-search" class="form-control" placeholder="Search by product name..." oninput="App.filterInventoryList()" style="padding: 6px 12px; height: 38px;">
                         </div>
                         <!-- Category Filter -->
                         <div style="flex:1; min-width:200px;">
-                            <select id="inventory-filter-category" class="form-control" onchange="App.filterInventoryList()" style="height:38px;">
+                            <select id="inventory-filter-category" class="form-control" onchange="App.filterInventoryList()" style="padding: 6px 12px; height: 38px;">
                                 <option value="" data-i18n="filter_all_categories">All Categories</option>
                                 <option value="chemical" data-i18n="chemical">Chemical Product</option>
                                 <option value="consumable" data-i18n="consumable">Consumable</option>
@@ -2171,7 +2171,7 @@ const App = {
                         </div>
                         <!-- Stock Level Filter -->
                         <div style="flex:1; min-width:200px;">
-                            <select id="inventory-filter-stock" class="form-control" onchange="App.filterInventoryList()" style="height:38px;">
+                            <select id="inventory-filter-stock" class="form-control" onchange="App.filterInventoryList()" style="padding: 6px 12px; height: 38px;">
                                 <option value="" data-i18n="filter_all_stocks">All Stock Levels</option>
                                 <option value="low" data-i18n="filter_low_stock_only">Low Stock Only</option>
                                 <option value="optimal" data-i18n="filter_optimal_stock_only">Optimal Stock</option>
